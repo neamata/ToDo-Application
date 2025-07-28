@@ -23,6 +23,10 @@ function renderHeader() {
         window.location.hash = "#login";
         currentUser = null;
         route();
+
+
+        document.getElementById("login-email").value = "";
+        document.getElementById("login-password").value = "";
     });
 }
 
@@ -114,6 +118,7 @@ function route() {
         }
     } else {
         showSections("dashboard");
+        loadTodos();
     }
 }
 
@@ -186,6 +191,8 @@ addBtn.addEventListener("click", function addbtn(event) {
 
 
 });
+
+
 
 const closeButton = document.getElementById("close-button");
 
@@ -286,6 +293,8 @@ function addTodoButton() {
         card.style.borderRight = "5px solid #ef4444";
     }
 
+    card.setAttribute("data-priority", priority);
+
     const div3 = document.createElement("div");
 
     const createdAtFormatted = document.createElement("h5");
@@ -303,6 +312,8 @@ function addTodoButton() {
     
     cardsId.appendChild(card);
 
+    saveTodo();
+
     modal.style.display = "none";
 
     document.getElementById("title").value = "";
@@ -312,3 +323,141 @@ function addTodoButton() {
 
     
 }
+
+function saveTodo() {
+  const data = document.querySelectorAll(".todo-card");
+  const todos = [];
+
+  data.forEach((card) => {
+    const title = card.querySelector("h3").textContent;
+    const taskItems = card.querySelectorAll("ul li");
+
+    const tasks = Array.from(taskItems).map((taskItem) => {
+      const taskText = taskItem.firstChild?.textContent?.trim() || "";
+      const isCompleted = taskItem.style.textDecoration === "line-through";
+      return {
+        text: taskText,
+        completed: isCompleted
+      };
+    });
+
+    const priority = card.getAttribute("data-priority") || "low";
+
+
+    const createdAt = card.querySelector("h5")?.textContent || new Date().toLocaleString();
+    const userName = card.querySelectorAll("h5")[1]?.textContent || currentUser?.userName || "unknown";
+
+    todos.push({
+      title,
+      tasks,
+      priority,
+      createdAt,
+      userName
+    });
+  });
+
+  if (currentUser) {
+        localStorage.setItem(`todos_${currentUser.userName}`, JSON.stringify(todos));
+    }
+}
+
+
+function loadTodos() {
+     if (!currentUser) return;
+
+    const cardsId = document.getElementById("cards-id");
+    cardsId.innerHTML = "";
+
+    const savedTodos = localStorage.getItem(`todos_${currentUser.userName}`);
+    if (!savedTodos) return;
+
+     const todos = JSON.parse(savedTodos);
+
+    todos.forEach(todo => {
+    const card = document.createElement("div");
+    card.classList.add("todo-card");
+
+    // Title
+    const titleElem = document.createElement("h3");
+    titleElem.textContent = todo.title;
+    titleElem.style.border = "2px solid #615ae8ff";
+    titleElem.style.borderRadius = "8px";
+    titleElem.style.padding = "0.75rem 1rem";
+    card.appendChild(titleElem);
+
+    // Tasks
+    const taskList = document.createElement("ul");
+    taskList.style.listStyle = "none";
+    taskList.style.padding = "0.75rem 1rem";
+    taskList.style.margin = "0";
+    taskList.style.border = "1px solid #615ae8ff";
+    taskList.style.borderRadius = "8px";
+
+    todo.tasks.forEach(task => {
+      const listItem = document.createElement("li");
+      listItem.classList.add("listItemNew");
+
+      const img = document.createElement("img");
+      img.src = task.completed ? "./images/checked.png" : "./images/unChecked.png";
+      listItem.style.textDecoration = task.completed ? "line-through" : "none";
+
+      const text = document.createTextNode(task.text);
+      listItem.appendChild(text);
+      listItem.appendChild(img);
+
+      taskList.appendChild(listItem);
+    });
+
+    card.appendChild(taskList);
+
+    // Buttons
+    const divButton = document.createElement("div");
+    divButton.classList.add("divBtn");
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.classList.add("cardButton");
+    divButton.appendChild(deleteBtn);
+
+    const completeBtn = document.createElement("button");
+    completeBtn.textContent = "Mark Complete";
+    completeBtn.classList.add("cardButton");
+    divButton.appendChild(completeBtn);
+
+    card.appendChild(divButton);
+
+    const updateBtn = document.createElement("button");
+    updateBtn.textContent = "Update ToDo";
+    updateBtn.classList.add("cardButton1");
+    card.appendChild(updateBtn);
+
+    // Priority border color
+    if (todo.priority === "low") {
+      card.style.borderRight = "5px solid #22c55e";
+    } else if (todo.priority === "medium") {
+      card.style.borderRight = "5px solid #facc15";
+    } else if (todo.priority === "high") {
+      card.style.borderRight = "5px solid #ef4444";
+    }
+
+    // Created at and user info
+    const div3 = document.createElement("div");
+    const createdAtFormatted = document.createElement("h5");
+    createdAtFormatted.textContent = todo.createdAt;
+
+    const nameElem = document.createElement("h5");
+    nameElem.textContent = todo.userName;
+
+    div3.appendChild(createdAtFormatted);
+    div3.appendChild(nameElem);
+    div3.style.display = "flex";
+    div3.style.justifyContent = "space-between";
+
+    card.appendChild(div3);
+
+    document.getElementById("cards-id").appendChild(card);
+  });
+}
+
+window.addEventListener("DOMContentLoaded", loadTodos);
+
