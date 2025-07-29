@@ -1,29 +1,58 @@
 {
   "users": [
     {
-      "id": "e82c",
-      "userName": "binal",
-      "email": "yyy@gmail.com",
-      "password": "yyy"
-    },
-    {
-      "id": "2f23",
-      "userName": "abc",
-      "email": "mom@gmail.com",
-      "password": "mom"
-    },
-    {
-      "id": "cd52",
-      "userName": "zxc",
-      "email": "zxc@gmail.com",
-      "password": "zxc"
-    },
-    {
-      "id": "d744",
+      "id": "334d",
       "userName": "Neamata",
       "email": "neamata@gmail.com",
       "password": "123"
+    },
+    {
+      "id": "02c4",
+      "userName": "abc",
+      "email": "abc@gmail.com",
+      "password": "123"
     }
   ],
-  "todos": []
+  "todos": [
+    {
+      "id": "7e14",
+      "userId": "334d",
+      "title": "Nest",
+      "tasks": [
+        {
+          "text": "Nedded",
+          "completed": false
+        },
+        {
+          "text": "Network",
+          "completed": true
+        }
+      ],
+      "priority": "high",
+      "createdAt": "2025-07-29T08:13:38.795Z",
+      "userName": "Neamata"
+    },
+    {
+      "id": "1c83",
+      "userId": "02c4",
+      "title": "Day",
+      "tasks": [
+        {
+          "text": "Mon",
+          "completed": true
+        },
+        {
+          "text": "Tue",
+          "completed": true
+        },
+        {
+          "text": "Wed",
+          "completed": false
+        }
+      ],
+      "priority": "medium",
+      "createdAt": "2025-07-29T08:14:48.516Z",
+      "userName": "abc"
+    }
+  ]
 }

@@ -312,7 +312,27 @@ function addTodoButton() {
     
     cardsId.appendChild(card);
 
+    const listElement = document.getElementById("list");
+
+const tasks = Array.from(listElement.children).map(li => {
+    const checkbox = li.querySelector('input[type="checkbox"]');
+    return {
+        text: li.childNodes[0]?.textContent.trim() || "",
+        completed: checkbox?.checked || false
+    };
+});
+    const todo = {
+        userId: currentUser.id,
+    title,
+    tasks,
+    priority,
+    createdAt: new Date().toISOString(),
+    userName: currentUser.userName
+};
+
+
     saveTodo();
+    saveTodoToApi(todo);
 
     modal.style.display = "none";
 
@@ -320,6 +340,7 @@ function addTodoButton() {
     document.getElementById("add-todo").value = "";
     document.querySelector(".priority").value = "low"; 
     document.getElementById("list").innerHTML = "";
+
 
     
 }
@@ -457,7 +478,48 @@ function loadTodos() {
 
     document.getElementById("cards-id").appendChild(card);
   });
+
+  fetch("http://localhost:3000/todos")
+  .then(res => res.json())
+  .then(apiTodo => {
+    apiTodo.forEach(todo => {
+        const addTodoInput = document.getElementById("add-todo");
+        const addTodo = addTodoInput.value;
+        const li = document.createElement("li");
+
+        const div2 = document.createElement("div");
+        div2.classList.add("child-list");
+
+        const span = document.createElement("span");
+        span.classList.add("todo-span");
+        span.textContent = addTodo;
+
+        const checkBox = document.createElement("input");
+        checkBox.type = "checkbox";
+        checkBox.classList.add("check-box");
+
+        checkBox.addEventListener("change", () => {
+            span.style.textDecoration = checkBox.checked ? "line-through" : "none";
+        });
+
+    });
+  });
 }
 
 window.addEventListener("DOMContentLoaded", loadTodos);
+
+function saveTodoToApi(todo) {
+
+    fetch ("http://localhost:3000/todos", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(todo)
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("Saved to API:", data);
+    });
+}
 
